@@ -184,9 +184,10 @@ def read_pdf(file_path: Path):
 # Chat endpoint that reads resume PDF, parses it, answers via LLM, and includes screening=True
 @app.post("/chat")
 def chat(request: ChatRequest):
-    resume_text = read_pdf(Path("my_resume.pdf"))
+    resume_path = Path(__file__).parent / "my_resume.pdf"
+    resume_text = read_pdf(resume_path)
     if resume_text == "No resume available.":
-        return {"screening": False, "answer": "Resume PDF not found. Please ensure 'my_resume.pdf' exists in the backend directory."}
+        return {"screening": False, "answer": f"Resume PDF not found at {resume_path}. Please ensure 'my_resume.pdf' exists in the backend directory."}
     
     resume = parse_resume(resume_text)
     answer = ask_candidate(request.question, resume)
@@ -198,9 +199,10 @@ def chat(request: ChatRequest):
 # Job Matching Endpoint
 @app.post("/match_job")
 def match_job(request: JobMatchRequest):
-    resume_text = read_pdf(Path("my_resume.pdf"))
+    resume_path = Path(__file__).parent / "my_resume.pdf"
+    resume_text = read_pdf(resume_path)
     if resume_text == "No resume available.":
-        return {"analysis": "Resume PDF not found. Please ensure 'my_resume.pdf' exists in the backend directory."}
+        return {"analysis": f"Resume PDF not found at {resume_path}. Please ensure 'my_resume.pdf' exists in the backend directory."}
         
     resume = parse_resume(resume_text)
     
