@@ -3,419 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Portfolio OS</title>
+    <title>AI Portfolio & Recruiter Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         body {
-            margin: 0;
-            overflow: hidden;
-            /* Developer-style wallpaper */
-            background: url('https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=2070&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            user-select: none;
-        }
-        
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.75);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            background-color: #050505;
+            color: #e5e5e5;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(79, 70, 229, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(147, 51, 234, 0.1) 0%, transparent 50%);
+            background-attachment: fixed;
         }
 
-        .window {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            max-width: 90vw;
-            height: 600px;
-            max-height: 80vh;
-            display: none;
-            flex-direction: column;
-            border-radius: 12px;
-            overflow: hidden;
-            z-index: 10;
+        .glass-card {
+            background: rgba(20, 20, 25, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .window.active {
-            display: flex;
-            z-index: 20;
+        .glass-card:hover {
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 4px 30px rgba(139, 92, 246, 0.15);
         }
 
-        .title-bar {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px 15px;
-            display: flex;
-            align-items: center;
-            cursor: move;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        .gradient-text {
+            background: linear-gradient(135deg, #a78bfa 0%, #60a5fa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .window-controls {
-            display: flex;
-            gap: 8px;
-        }
-
-        .control-btn {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-
-        .close-btn { background: #ff5f56; }
-        .min-btn { background: #ffbd2e; }
-        .max-btn { background: #27c93f; }
-
-        .desktop-container {
-            padding: 50px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 15px;
-            height: 100vh;
-        }
-
-        .desktop-icon {
-            width: 90px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px;
-            border-radius: 8px;
-            transition: background 0.2s;
-        }
-
-        .desktop-icon:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        .desktop-icon i {
-            font-size: 45px;
-            color: white;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-            margin-bottom: 8px;
-        }
-
-        .desktop-icon span {
-            color: white;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-            text-align: center;
-            font-size: 13px;
-            font-weight: 500;
-        }
-        
-        .dock {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-radius: 24px;
-            padding: 10px 20px;
-            display: flex;
-            gap: 15px;
-            z-index: 100;
-        }
-
-        .dock-icon {
-            width: 55px;
-            height: 55px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 14px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .dock-icon:hover {
-            transform: scale(1.15) translateY(-8px);
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .dock-icon i {
-            font-size: 28px;
-            color: white;
-        }
-
-        /* Top Menu Bar */
-        .menu-bar {
-            height: 28px;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(15px);
-            display: flex;
-            align-items: center;
-            padding: 0 20px;
-            color: white;
-            font-size: 13px;
-            font-weight: 500;
-            justify-content: space-between;
-        }
-
-        .markdown-body h3 {
-            color: #c084fc;
-            margin-top: 20px;
-            margin-bottom: 8px;
-            font-size: 1.1rem;
-        }
-        .markdown-body h4 {
+        .nav-btn.active {
+            background: rgba(139, 92, 246, 0.1);
             color: #a78bfa;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            font-size: 1rem;
+            border-right: 2px solid #a78bfa;
         }
-        .markdown-body ul, .markdown-body ol {
-            list-style-type: disc;
-            margin-left: 24px;
-            margin-bottom: 12px;
+
+        .content-section {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
         }
-        .markdown-body li {
-            margin-bottom: 4px;
+
+        .content-section.active {
+            display: block;
         }
-        .markdown-body p {
-            margin-bottom: 12px;
-            line-height: 1.6;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .markdown-body strong {
-            color: #e2e8f0;
-            font-weight: 600;
-        }
+
+        /* Markdown Styling */
+        .markdown-body h3 { color: #a78bfa; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .markdown-body ul { list-style-type: disc; margin-left: 1.5rem; margin-bottom: 1rem; color: #d4d4d8; }
+        .markdown-body li { margin-bottom: 0.25rem; }
+        .markdown-body strong { color: #f4f4f5; font-weight: 600; }
+        .markdown-body p { margin-bottom: 1rem; line-height: 1.6; color: #d4d4d8; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col md:flex-row">
 
-    <!-- Menu Bar -->
-    <div class="menu-bar w-full fixed top-0 z-50">
-        <div class="flex items-center gap-5">
-            <span class="cursor-pointer font-bold">PortfolioOS</span>
-            <span class="cursor-pointer hover:text-gray-300">File</span>
-            <span class="cursor-pointer hover:text-gray-300">Edit</span>
-            <span class="cursor-pointer hover:text-gray-300">View</span>
-            <span class="cursor-pointer hover:text-gray-300">Help</span>
-        </div>
-        <div class="flex items-center gap-4">
-            <i class="fas fa-wifi"></i>
-            <i class="fas fa-battery-three-quarters"></i>
-            <span id="clock">12:00 AM</span>
-        </div>
-    </div>
-
-    <!-- Desktop Container Removed -->
-
-    <!-- Chat Window -->
-    <div id="chat-window" class="window glass-panel text-slate-100">
-        <div class="title-bar" onmousedown="dragWindow(event, 'chat-window')">
-            <div class="window-controls">
-                <div class="control-btn close-btn" onclick="closeWindow('chat-window')"></div>
-                <div class="control-btn min-btn" onclick="closeWindow('chat-window')"></div>
-                <div class="control-btn max-btn"></div>
-            </div>
-            <div class="flex-1 text-center font-semibold text-sm">AI Resume Assistant</div>
-        </div>
-        <div class="flex-1 flex flex-col overflow-hidden bg-slate-900/60">
-            <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-4 select-text">
-                <div class="bg-slate-800 p-3 rounded-xl max-w-[85%] text-slate-200 shadow-lg border border-slate-700">
-                    Hello! 👋 I am an AI trained on the candidate's resume. Ask me about their tech stack, experience, or projects!
-                </div>
-                <!-- Chat Suggestions -->
-                <div class="flex flex-wrap gap-2 mt-2" id="chat-suggestions">
-                    <button class="suggestion-btn text-xs bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-3 py-1.5 rounded-full hover:bg-indigo-500/40 transition">What are his top skills?</button>
-                    <button class="suggestion-btn text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-3 py-1.5 rounded-full hover:bg-emerald-500/40 transition">Does he know AI and LLMs?</button>
-                    <button class="suggestion-btn text-xs bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-3 py-1.5 rounded-full hover:bg-cyan-500/40 transition">Tell me about his projects.</button>
+    <!-- Sidebar / Navigation -->
+    <aside class="w-full md:w-72 md:fixed md:h-screen border-b md:border-b-0 md:border-r border-white/5 bg-black/40 backdrop-blur-xl flex flex-col p-6 z-20">
+        <!-- Profile Header -->
+        <div class="text-center mb-8 pt-4">
+            <!-- REPLACE THE IMAGE SRC URL BELOW TO ADD YOUR OWN PICTURE -->
+            <div class="relative w-28 h-28 mx-auto mb-4">
+                <div class="absolute inset-0 bg-gradient-to-tr from-purple-500 to-blue-500 rounded-full animate-spin-slow" style="animation-duration: 8s; padding: 2px;">
+                    <img src="https://images.unsplash.com/photo-1531297172864-45d0601f1239?w=400&q=80" alt="Profile" class="w-full h-full object-cover rounded-full border-4 border-black">
                 </div>
             </div>
-            <div class="p-4 bg-slate-900 border-t border-slate-700">
-                <form id="chat-form" class="flex gap-2">
-                    <input type="text" id="user-input" placeholder="e.g., What is their experience with Python?" 
-                        class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 text-white select-text">
-                    <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-lg font-medium text-sm transition shadow-lg">
-                        Send
-                    </button>
-                </form>
+            <h1 class="text-xl font-bold text-white mb-1">MOHD NAJAM NIZAM</h1>
+            <p class="text-sm text-purple-400 font-medium tracking-wide">AI Engineer & Developer</p>
+            
+            <div class="flex justify-center gap-4 mt-4">
+                <!-- REPLACE THE HREF URLS TO LINK YOUR ACTUAL GITHUB & LINKEDIN -->
+                <a href="https://github.com/farrakhnizam786" target="_blank" class="text-gray-400 hover:text-white transition"><i class="fab fa-github text-xl"></i></a>
+                <a href="#" target="_blank" class="text-gray-400 hover:text-blue-400 transition"><i class="fab fa-linkedin text-xl"></i></a>
             </div>
         </div>
-    </div>
 
-    <!-- Job Matcher Window -->
-    <div id="job-matcher-window" class="window glass-panel text-slate-100">
-        <div class="title-bar" onmousedown="dragWindow(event, 'job-matcher-window')">
-            <div class="window-controls">
-                <div class="control-btn close-btn" onclick="closeWindow('job-matcher-window')"></div>
-                <div class="control-btn min-btn" onclick="closeWindow('job-matcher-window')"></div>
-                <div class="control-btn max-btn"></div>
-            </div>
-            <div class="flex-1 text-center font-semibold text-sm">Job Fit Analyzer</div>
-        </div>
-        <div class="flex-1 flex flex-col p-6 overflow-y-auto bg-slate-900/60 select-text">
-            <h2 class="text-2xl font-bold mb-2 text-purple-400"><i class="fas fa-briefcase mr-2"></i>Job Fit Analyzer</h2>
-            <p class="text-slate-300 mb-4 text-sm">Paste a job description below. The AI will analyze how well my resume fits the role and provide a match score.</p>
-            <textarea id="job-description" class="w-full h-32 bg-slate-800 border border-slate-600 rounded-lg p-4 text-slate-200 focus:outline-none focus:border-purple-500 mb-4 text-sm resize-none" placeholder="Paste job description here..."></textarea>
-            <button id="match-btn" class="bg-purple-600 hover:bg-purple-500 text-white px-6 py-2.5 rounded-lg font-medium transition shadow-lg w-fit">
-                Analyze Fit
+        <!-- Navigation Links -->
+        <nav class="flex flex-col gap-2 flex-1">
+            <button onclick="switchTab('projects')" id="btn-projects" class="nav-btn active flex items-center gap-3 w-full text-left px-4 py-3 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-white/5 transition font-medium">
+                <i class="fas fa-layer-group w-5"></i> My Portfolio
             </button>
-            <div id="match-results" class="mt-6 p-5 bg-slate-800/80 rounded-xl border border-slate-700 hidden text-sm text-slate-200 markdown-body">
-                <!-- Results go here -->
-            </div>
-        </div>
-    </div>
+            <button onclick="switchTab('chat')" id="btn-chat" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-white/5 transition font-medium">
+                <i class="fas fa-robot w-5"></i> AI Recruiter Bot
+            </button>
+            <button onclick="switchTab('matcher')" id="btn-matcher" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-white/5 transition font-medium">
+                <i class="fas fa-bullseye w-5"></i> Job Fit Analyzer
+            </button>
+            <!-- NEW FEATURE: Skills Matrix -->
+            <button onclick="switchTab('skills')" id="btn-skills" class="nav-btn flex items-center gap-3 w-full text-left px-4 py-3 rounded-lg text-gray-400 hover:text-gray-200 hover:bg-white/5 transition font-medium">
+                <i class="fas fa-chart-radar w-5"></i> Skills Matrix
+            </button>
+        </nav>
 
-    <!-- Projects Window -->
-    <div id="projects-window" class="window glass-panel text-slate-100">
-        <div class="title-bar" onmousedown="dragWindow(event, 'projects-window')">
-            <div class="window-controls">
-                <div class="control-btn close-btn" onclick="closeWindow('projects-window')"></div>
-                <div class="control-btn min-btn" onclick="closeWindow('projects-window')"></div>
-                <div class="control-btn max-btn"></div>
-            </div>
-            <div class="flex-1 text-center font-semibold text-sm">Portfolio Explorer</div>
+        <div class="mt-auto text-xs text-center text-gray-600 pt-6">
+            Powered by Groq LLM & FastAPI
         </div>
-        <div class="flex-1 p-6 overflow-y-auto bg-slate-900/60 select-text">
-            <h2 class="text-2xl font-bold mb-6 text-blue-400"><i class="fas fa-folder-open mr-2"></i>My Portfolio</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                <!-- Project 1 -->
-                <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-700 hover:border-blue-500 transition shadow-lg">
-                    <h3 class="text-lg font-bold text-white mb-2">HireMe AI</h3>
-                    <p class="text-slate-400 text-sm mb-4">An automated resume tailoring and gap analysis pipeline.</p>
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="bg-slate-700 px-2 py-1 rounded text-slate-300">FastAPI, Python</span>
-                        <a href="https://github.com/" target="_blank" class="text-blue-400 hover:underline"><i class="fab fa-github mr-1"></i>Repo</a>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 md:ml-72 p-6 md:p-12 max-w-6xl">
+        
+        <!-- ========================================== -->
+        <!-- PROJECTS SECTION (PORTFOLIO)               -->
+        <!-- ========================================== -->
+        <section id="projects" class="content-section active">
+            <header class="mb-10">
+                <h2 class="text-3xl font-bold text-white mb-2">Featured <span class="gradient-text">Projects</span></h2>
+                <p class="text-gray-400">A showcase of my recent work in AI, Machine Learning, and Web Development.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- PROJECT CARD 1 -->
+                <div class="glass-card overflow-hidden group">
+                    <div class="h-48 overflow-hidden relative">
+                        <!-- Project Image -->
+                        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80" alt="Project 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#141419] to-transparent"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">HireMe AI (Tailor Pipeline)</h3>
+                        <p class="text-sm text-gray-400 mb-4 h-10 overflow-hidden">An automated resume tailoring and gap analysis pipeline powered by LLMs and Pydantic.</p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-2 py-1 bg-purple-500/10 text-purple-400 text-xs rounded-md border border-purple-500/20">Python</span>
+                            <span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-md border border-blue-500/20">FastAPI</span>
+                            <span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-md border border-emerald-500/20">Groq LLM</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center border-t border-white/5 pt-4">
+                            <!-- GitHub Link -->
+                            <a href="https://github.com/farrakhnizam786" target="_blank" class="text-sm text-gray-300 hover:text-white flex items-center gap-2 transition">
+                                <i class="fab fa-github"></i> View Source
+                            </a>
+                        </div>
                     </div>
                 </div>
-                <!-- Project 2 -->
-                <div class="bg-slate-800/80 p-5 rounded-xl border border-slate-700 hover:border-blue-500 transition shadow-lg">
-                    <h3 class="text-lg font-bold text-white mb-2">AI Assistant Teacher</h3>
-                    <p class="text-slate-400 text-sm mb-4">Interactive AI pedagogical agent built to assist students.</p>
-                    <div class="flex justify-between items-center text-xs">
-                        <span class="bg-slate-700 px-2 py-1 rounded text-slate-300">Flask & ML</span>
-                        <a href="https://github.com/" target="_blank" class="text-blue-400 hover:underline"><i class="fab fa-github mr-1"></i>Repo</a>
+
+                <!-- PROJECT CARD 2 -->
+                <div class="glass-card overflow-hidden group">
+                    <div class="h-48 overflow-hidden relative">
+                        <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80" alt="Project 2" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-[#141419] to-transparent"></div>
+                    </div>
+                    <div class="p-6">
+                        <h3 class="text-xl font-bold text-white mb-2">AI Assistant Teacher</h3>
+                        <p class="text-sm text-gray-400 mb-4 h-10 overflow-hidden">Interactive AI pedagogical agent built to assist students with real-time explanations.</p>
+                        
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <span class="px-2 py-1 bg-yellow-500/10 text-yellow-400 text-xs rounded-md border border-yellow-500/20">Flask</span>
+                            <span class="px-2 py-1 bg-orange-500/10 text-orange-400 text-xs rounded-md border border-orange-500/20">TensorFlow</span>
+                            <span class="px-2 py-1 bg-pink-500/10 text-pink-400 text-xs rounded-md border border-pink-500/20">NLP</span>
+                        </div>
+                        
+                        <div class="flex justify-between items-center border-t border-white/5 pt-4">
+                            <a href="https://github.com/farrakhnizam786" target="_blank" class="text-sm text-gray-300 hover:text-white flex items-center gap-2 transition">
+                                <i class="fab fa-github"></i> View Source
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HOW TO ADD A NEW PROJECT:
+                Copy the entire <div class="glass-card..."> ... </div> block from above and paste it here.
+                Change the <img> src URL to add a new picture.
+                Change the <a> href URL to add your git link! 
+                -->
+
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- AI RECRUITER BOT SECTION                   -->
+        <!-- ========================================== -->
+        <section id="chat" class="content-section h-full max-h-[85vh]">
+            <header class="mb-6">
+                <h2 class="text-3xl font-bold text-white mb-2">AI <span class="gradient-text">Recruiter Bot</span></h2>
+                <p class="text-gray-400">Ask the AI agent anything about my experience, built using RAG on my resume.</p>
+            </header>
+
+            <div class="glass-card flex flex-col h-[65vh] border border-purple-500/20 relative">
+                
+                <!-- Chat Messages Area -->
+                <div id="chat-messages" class="flex-1 p-6 overflow-y-auto space-y-6">
+                    
+                    <!-- Bot Welcome Message -->
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shrink-0 border border-purple-400/30">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-5 py-3 text-sm text-gray-200 max-w-[85%] shadow-md">
+                            Hello! 👋 I am an AI trained specifically on this candidate's resume. What would you like to know about their technical skills, experience, or education?
+                        </div>
+                    </div>
+
+                    <!-- Chat Suggestions (Prompt Chips) -->
+                    <div class="ml-14 flex flex-wrap gap-2" id="chat-suggestions">
+                        <button class="suggestion-btn text-xs bg-purple-500/10 text-purple-300 border border-purple-500/20 px-4 py-2 rounded-lg hover:bg-purple-500/20 transition">What are his core programming languages?</button>
+                        <button class="suggestion-btn text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 px-4 py-2 rounded-lg hover:bg-blue-500/20 transition">Tell me about his Generative AI experience.</button>
+                        <button class="suggestion-btn text-xs bg-emerald-500/10 text-emerald-300 border border-emerald-500/20 px-4 py-2 rounded-lg hover:bg-emerald-500/20 transition">Where did he study?</button>
+                    </div>
+
+                </div>
+
+                <!-- Chat Input Form -->
+                <div class="p-4 border-t border-white/5 bg-black/20 rounded-b-16">
+                    <form id="chat-form" class="relative flex items-center">
+                        <input type="text" id="user-input" placeholder="Ask about my skills..." 
+                            class="w-full bg-white/5 border border-white/10 rounded-xl pl-4 pr-12 py-3.5 text-sm text-white focus:outline-none focus:border-purple-500/50 focus:bg-white/10 transition">
+                        <button type="submit" class="absolute right-2 w-10 h-10 rounded-lg bg-purple-600 hover:bg-purple-500 text-white flex items-center justify-center transition shadow-lg shadow-purple-500/20">
+                            <i class="fas fa-paper-plane text-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ========================================== -->
+        <!-- JOB FIT ANALYZER SECTION                   -->
+        <!-- ========================================== -->
+        <section id="matcher" class="content-section">
+            <header class="mb-6">
+                <h2 class="text-3xl font-bold text-white mb-2">Job Fit <span class="gradient-text">Analyzer</span></h2>
+                <p class="text-gray-400">Paste a Job Description. The AI will instantly analyze my resume against the requirements.</p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Input Panel -->
+                <div class="glass-card p-6 flex flex-col h-[65vh]">
+                    <h3 class="text-lg font-semibold text-white mb-4"><i class="fas fa-paste text-blue-400 mr-2"></i>Job Description</h3>
+                    <textarea id="job-description" class="flex-1 w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-gray-200 focus:outline-none focus:border-blue-500/50 resize-none transition mb-4 custom-scrollbar" placeholder="Paste the responsibilities and requirements of the job here..."></textarea>
+                    
+                    <button id="match-btn" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white px-6 py-3.5 rounded-xl font-bold tracking-wide transition shadow-lg shadow-blue-500/20 flex justify-center items-center gap-2">
+                        <i class="fas fa-search-dollar"></i> Analyze Fit
+                    </button>
+                </div>
+
+                <!-- Results Panel -->
+                <div class="glass-card p-6 flex flex-col h-[65vh] overflow-y-auto relative">
+                    <h3 class="text-lg font-semibold text-white mb-4"><i class="fas fa-poll text-emerald-400 mr-2"></i>AI Analysis Report</h3>
+                    
+                    <!-- Placeholder State -->
+                    <div id="match-placeholder" class="flex-1 flex flex-col items-center justify-center text-gray-500 opacity-50">
+                        <i class="fas fa-file-contract text-5xl mb-4"></i>
+                        <p class="text-sm">Submit a job description to see the results.</p>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div id="match-loading" class="hidden flex-1 flex flex-col items-center justify-center text-blue-400">
+                        <i class="fas fa-circle-notch fa-spin text-4xl mb-4"></i>
+                        <p class="text-sm font-medium animate-pulse">Running semantic analysis...</p>
+                    </div>
+
+                    <!-- Results Content -->
+                    <div id="match-results" class="hidden text-sm markdown-body pb-4">
+                        <!-- AI Markdown Injected Here -->
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </section>
 
-    <!-- Dock -->
-    <div class="dock glass-panel items-end">
-        <div class="flex flex-col items-center gap-1 cursor-pointer group" onclick="openWindow('projects-window')">
-            <div class="dock-icon">
-                <i class="fas fa-folder text-blue-400"></i>
-            </div>
-            <span class="text-white text-xs font-medium text-shadow">Projects</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 cursor-pointer group" onclick="openWindow('chat-window')">
-            <div class="dock-icon">
-                <i class="fas fa-robot text-emerald-400"></i>
-            </div>
-            <span class="text-white text-xs font-medium text-shadow">AI Bot</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 cursor-pointer group" onclick="openWindow('job-matcher-window')">
-            <div class="dock-icon">
-                <i class="fas fa-briefcase text-purple-400"></i>
-            </div>
-            <span class="text-white text-xs font-medium text-shadow">Matcher</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 cursor-pointer group" onclick="window.open('https://github.com/', '_blank')">
-            <div class="dock-icon">
-                <i class="fab fa-github text-white"></i>
-            </div>
-            <span class="text-white text-xs font-medium text-shadow">GitHub</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 cursor-pointer group" onclick="window.open('https://vercel.com/', '_blank')">
-            <div class="dock-icon">
-                <i class="fas fa-caret-up text-white" style="font-size: 32px;"></i>
-            </div>
-            <span class="text-white text-xs font-medium text-shadow">Vercel</span>
-        </div>
-    </div>
+        <!-- ========================================== -->
+        <!-- NEW FEATURE: SKILLS MATRIX                 -->
+        <!-- ========================================== -->
+        <section id="skills" class="content-section">
+            <header class="mb-10">
+                <h2 class="text-3xl font-bold text-white mb-2">Skills <span class="gradient-text">Matrix</span></h2>
+                <p class="text-gray-400">A visual breakdown of my technical capabilities and tools.</p>
+            </header>
 
-    <!-- Scripts -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- AI & ML -->
+                <div class="glass-card p-6 border-t-4 border-t-purple-500">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-3 bg-purple-500/10 rounded-lg"><i class="fas fa-brain text-purple-400 text-xl"></i></div>
+                        <h3 class="text-lg font-bold text-white">AI & ML</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="flex justify-between items-center"><span>Generative AI & LLMs</span> <span class="text-purple-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>RAG & LangChain</span> <span class="text-purple-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>Deep Learning (PyTorch)</span> <span class="text-purple-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>Computer Vision (GANs)</span> <span class="text-purple-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span></li>
+                    </ul>
+                </div>
+
+                <!-- Backend & Web -->
+                <div class="glass-card p-6 border-t-4 border-t-blue-500">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-3 bg-blue-500/10 rounded-lg"><i class="fas fa-server text-blue-400 text-xl"></i></div>
+                        <h3 class="text-lg font-bold text-white">Backend & Web</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="flex justify-between items-center"><span>Python & FastAPI</span> <span class="text-blue-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>Java</span> <span class="text-blue-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>React & Node.js</span> <span class="text-blue-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>SQL & PostgreSQL</span> <span class="text-blue-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span></li>
+                    </ul>
+                </div>
+
+                <!-- Cloud & Tools -->
+                <div class="glass-card p-6 border-t-4 border-t-emerald-500">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="p-3 bg-emerald-500/10 rounded-lg"><i class="fas fa-cloud text-emerald-400 text-xl"></i></div>
+                        <h3 class="text-lg font-bold text-white">Cloud & DevOps</h3>
+                    </div>
+                    <ul class="space-y-3 text-sm text-gray-300">
+                        <li class="flex justify-between items-center"><span>Git & GitHub</span> <span class="text-emerald-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>Docker & Kubernetes</span> <span class="text-emerald-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>Google Cloud (GCP)</span> <span class="text-emerald-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i></span></li>
+                        <li class="flex justify-between items-center"><span>AWS</span> <span class="text-emerald-400"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="far fa-star"></i><i class="far fa-star"></i></span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Logic -->
     <script>
-        // Clock functionality
-        function updateClock() {
-            const now = new Date();
-            let hours = now.getHours();
-            let minutes = now.getMinutes();
-            const ampm = hours >= 12 ? 'PM' : 'AM';
-            hours = hours % 12;
-            hours = hours ? hours : 12; 
-            minutes = minutes < 10 ? '0' + minutes : minutes;
-            document.getElementById('clock').innerText = hours + ':' + minutes + ' ' + ampm;
-        }
-        setInterval(updateClock, 1000);
-        updateClock();
-
-        // Window Management
-        let zIndexCounter = 20;
-
-        function openWindow(id) {
-            const win = document.getElementById(id);
-            win.style.zIndex = ++zIndexCounter;
-            win.classList.add('active');
-        }
-
-        function closeWindow(id) {
-            document.getElementById(id).classList.remove('active');
-        }
-
-        // Dragging Logic
-        function dragWindow(e, windowId) {
-            if(e.target.classList.contains('control-btn')) return;
-            const win = document.getElementById(windowId);
-            win.style.zIndex = ++zIndexCounter;
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             
-            let startX = e.clientX;
-            let startY = e.clientY;
-            
-            const rect = win.getBoundingClientRect();
-            // Calculate offset based on current transform
-            const transformMatrix = window.getComputedStyle(win).transform;
-            let currentX = 0, currentY = 0;
-            if (transformMatrix !== 'none') {
-                const matrixValues = transformMatrix.split('(')[1].split(')')[0].split(',');
-                currentX = parseFloat(matrixValues[4]);
-                currentY = parseFloat(matrixValues[5]);
-            }
-            
-            // Adjust offset to not jump
-            let offsetX = startX - win.offsetLeft;
-            let offsetY = startY - win.offsetTop;
-
-            function onMouseMove(e) {
-                const newX = e.clientX - offsetX;
-                const newY = e.clientY - offsetY;
-                win.style.left = newX + 'px';
-                win.style.top = newY + 'px';
-                win.style.transform = 'none'; // Clear transform to avoid conflicts
-            }
-
-            function onMouseUp() {
-                document.removeEventListener('mousemove', onMouseMove);
-                document.removeEventListener('mouseup', onMouseUp);
-            }
-
-            document.addEventListener('mousemove', onMouseMove);
-            document.addEventListener('mouseup', onMouseUp);
+            // Show target section
+            document.getElementById(tabId).classList.add('active');
+            document.getElementById('btn-' + tabId).classList.add('active');
         }
 
-        // Focus window on click
-        document.querySelectorAll('.window').forEach(win => {
-            win.addEventListener('mousedown', () => {
-                win.style.zIndex = ++zIndexCounter;
-            });
-        });
-
-        // Chat Form Handler
+        // ==========================================
+        // Chatbot Logic
+        // ==========================================
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
         const chatMessages = document.getElementById('chat-messages');
+
+        // Handle suggestion clicks
+        document.querySelectorAll('.suggestion-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                userInput.value = btn.innerText;
+                document.getElementById('chat-suggestions').style.display = 'none';
+                chatForm.dispatchEvent(new Event('submit'));
+            });
+        });
 
         chatForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -424,17 +373,31 @@
 
             // Append User Message
             chatMessages.innerHTML += `
-                <div class="flex justify-end">
-                    <div class="bg-indigo-600 text-white p-3 rounded-xl max-w-[85%] shadow-md">${question}</div>
+                <div class="flex items-start gap-4 justify-end">
+                    <div class="bg-purple-600/90 border border-purple-500/50 rounded-2xl rounded-tr-sm px-5 py-3 text-sm text-white max-w-[85%] shadow-md">
+                        ${question}
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/20">
+                        <i class="fas fa-user text-gray-300 text-sm"></i>
+                    </div>
                 </div>
             `;
             userInput.value = '';
+            document.getElementById('chat-suggestions').style.display = 'none';
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
+            // Loading indicator
             const loadingId = 'loading-' + Date.now();
             chatMessages.innerHTML += `
-                <div id="${loadingId}" class="flex justify-start">
-                    <div class="bg-slate-800 text-slate-400 p-3 rounded-xl animate-pulse border border-slate-700">Thinking...</div>
+                <div id="${loadingId}" class="flex items-start gap-4">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shrink-0">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-5 py-3 text-sm text-gray-400 flex gap-1 items-center">
+                        <div class="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                        <div class="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                        <div class="w-1.5 h-1.5 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                    </div>
                 </div>
             `;
             chatMessages.scrollTop = chatMessages.scrollHeight;
@@ -450,43 +413,51 @@
                 document.getElementById(loadingId).remove();
 
                 chatMessages.innerHTML += `
-                    <div class="flex justify-start">
-                        <div class="bg-slate-800 text-slate-200 p-3 rounded-xl max-w-[85%] border border-slate-700 shadow-md">${data.answer}</div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shrink-0 border border-purple-400/30">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-5 py-3 text-sm text-gray-200 max-w-[85%] shadow-md leading-relaxed">
+                            ${data.answer}
+                        </div>
                     </div>
                 `;
             } catch (error) {
                 document.getElementById(loadingId).remove();
                 chatMessages.innerHTML += `
-                    <div class="flex justify-start">
-                        <div class="bg-red-900/50 text-red-200 p-3 rounded-xl max-w-[85%] border border-red-800">Error connecting to backend server.</div>
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-red-600 flex items-center justify-center shrink-0">
+                            <i class="fas fa-exclamation text-white"></i>
+                        </div>
+                        <div class="bg-red-900/30 border border-red-500/50 rounded-2xl rounded-tl-sm px-5 py-3 text-sm text-red-200">
+                            Error connecting to backend server.
+                        </div>
                     </div>
                 `;
             }
             chatMessages.scrollTop = chatMessages.scrollHeight;
         });
 
-        // Chat Suggestions Handler
-        document.querySelectorAll('.suggestion-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                userInput.value = btn.innerText;
-                document.getElementById('chat-suggestions').style.display = 'none';
-                chatForm.dispatchEvent(new Event('submit'));
-            });
-        });
-
-        // Job Matcher Handler
+        // ==========================================
+        // Job Matcher Logic
+        // ==========================================
         const matchBtn = document.getElementById('match-btn');
         const jobDesc = document.getElementById('job-description');
         const matchResults = document.getElementById('match-results');
+        const matchPlaceholder = document.getElementById('match-placeholder');
+        const matchLoading = document.getElementById('match-loading');
 
         matchBtn.addEventListener('click', async () => {
             const desc = jobDesc.value.trim();
             if(!desc) return;
 
-            matchBtn.innerText = "Analyzing Fit...";
-            matchBtn.classList.add('animate-pulse');
+            // UI State updates
+            matchBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Analyzing...';
             matchBtn.disabled = true;
+            matchPlaceholder.classList.add('hidden');
             matchResults.classList.add('hidden');
+            matchLoading.classList.remove('hidden');
+            matchLoading.classList.add('flex');
 
             try {
                 const response = await fetch('/match_job', {
@@ -497,15 +468,20 @@
 
                 const data = await response.json();
                 
-                // Using marked.js to render the markdown response
+                // Hide loading, show results
+                matchLoading.classList.add('hidden');
+                matchLoading.classList.remove('flex');
+                
                 matchResults.innerHTML = marked.parse(data.analysis);
                 matchResults.classList.remove('hidden');
+                
             } catch(e) {
-                matchResults.innerHTML = "<p class='text-red-400 font-medium'><i class='fas fa-exclamation-circle mr-2'></i>Error connecting to backend server.</p>";
+                matchLoading.classList.add('hidden');
+                matchLoading.classList.remove('flex');
+                matchResults.innerHTML = "<p class='text-red-400 font-medium'><i class='fas fa-exclamation-circle mr-2'></i>Error connecting to server.</p>";
                 matchResults.classList.remove('hidden');
             } finally {
-                matchBtn.innerText = "Analyze Fit";
-                matchBtn.classList.remove('animate-pulse');
+                matchBtn.innerHTML = '<i class="fas fa-search-dollar"></i> Analyze Fit';
                 matchBtn.disabled = false;
             }
         });
