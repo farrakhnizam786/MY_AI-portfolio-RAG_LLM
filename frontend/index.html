@@ -74,8 +74,13 @@
 </head>
 <body class="min-h-screen flex flex-col md:flex-row">
 
+    <!-- Mobile Menu Button -->
+    <button onclick="toggleSidebar()" class="md:hidden fixed bottom-6 right-6 z-50 bg-gradient-to-r from-purple-600 to-blue-600 text-white w-14 h-14 rounded-full shadow-lg shadow-purple-500/30 flex items-center justify-center text-xl transition-transform hover:scale-105">
+        <i class="fas fa-bars" id="menu-icon"></i>
+    </button>
+
     <!-- Sidebar / Navigation -->
-    <aside class="w-full md:w-72 md:fixed md:h-screen border-b md:border-b-0 md:border-r border-white/5 bg-black/40 backdrop-blur-xl flex flex-col p-6 z-20">
+    <aside id="sidebar" class="fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out w-72 h-screen overflow-y-auto border-r border-white/5 bg-[#08080b]/95 backdrop-blur-xl flex flex-col p-6 z-40">
 <!-- Profile Header -->
 <div class="text-center mb-7 pt-4">
     <!-- Profile Picture -->
@@ -143,10 +148,18 @@
             <header class="mb-10">
                 <h2 class="text-3xl font-bold text-white mb-2">Featured <span class="gradient-text">Projects</span></h2>
                 <p class="text-gray-400">A showcase of my recent work in AI, Machine Learning, and Web Development.</p>
+                
+                <!-- Project Filters -->
+                <div class="flex flex-wrap gap-2 mt-6">
+                    <button onclick="filterProjects('all')" id="filter-all" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-purple-600 text-white transition">All</button>
+                    <button onclick="filterProjects('mern')" id="filter-mern" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition">MERN App</button>
+                    <button onclick="filterProjects('ai')" id="filter-ai" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition">Normal App (AI)</button>
+                    <button onclick="filterProjects('git')" id="filter-git" class="filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition">Only Git App</button>
+                </div>
             </header>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">  
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="projects-grid">  
                            <!-- PROJECT CARD 1-->
-<div class="glass-card overflow-hidden group">
+<div class="glass-card overflow-hidden group project-card" data-category="mern">
     <div class="h-48 overflow-hidden relative">
         <!-- Project Image -->
         <img src="https://drive.google.com/thumbnail?id=1-UKbGf9VPUPvYBQfHzY_7GfKjUIafIzG&sz=w1000"
@@ -204,7 +217,7 @@
 </div>
 
                 <!-- PROJECT CARD 2 -->
-                <div class="glass-card overflow-hidden group">
+                <div class="glass-card overflow-hidden group project-card" data-category="git">
                     <div class="h-48 overflow-hidden relative">
                         <!-- Project Image -->
                         <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80" alt="Project 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
@@ -232,7 +245,7 @@
                 </div>
 
                 <!-- PROJECT CARD 3 -->
-                <div class="glass-card overflow-hidden group">
+                <div class="glass-card overflow-hidden group project-card" data-category="git">
                     <div class="h-48 overflow-hidden relative">
                         <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=800&q=80" alt="Project 2" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#141419] to-transparent"></div>
@@ -261,7 +274,7 @@
 
      
                 <!-- PROJECT CARD 4 -->
-                <div class="glass-card overflow-hidden group">
+                <div class="glass-card overflow-hidden group project-card" data-category="mern">
                     <div class="h-48 overflow-hidden relative">
                         <!-- Project Image -->
                         <img src="https://drive.google.com/thumbnail?id=1StOu4wJ-uZdbVOM8gnyHFl4ryU72hbrC&sz=w1000" alt="Serve Dine" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
@@ -282,7 +295,7 @@
                         <div class="flex justify-between items-center border-t border-white/5 pt-4">
                             <!-- GitHub Link -->
                             <a href="https://serv-dine-smart-restaurant-ordering.vercel.app/" target="_blank" class="text-sm text-gray-300 hover:text-white flex items-center gap-2 transition">
-                                <i class="fab fa-github"></i> Live Demo
+                                <i class="fas fa-external-link-alt"></i> Live Demo
                             </a>
                         </div>
                     </div>
@@ -290,28 +303,31 @@
 
 
                 <!-- PROJECT CARD 5 -->
-                <div class="glass-card overflow-hidden group">
+                <div class="glass-card overflow-hidden group project-card" data-category="ai">
                     <div class="h-48 overflow-hidden relative">
                         <!-- Project Image -->
-                        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80" alt="Project 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <img src="https://drive.google.com/thumbnail?id=1h5IWmxYYV_gp62Sxf4rtoYAe53T2C3q4&sz=w1000" alt="Project 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#141419] to-transparent"></div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">HireMe AI (Tailor Pipeline)</h3>
-                        <p class="text-sm text-gray-400 mb-4 h-10 overflow-hidden">An automated resume tailoring and gap analysis pipeline powered by LLMs and Pydantic.</p>
+                        <h3 class="text-xl font-bold text-white mb-2">Ai-Podcast-transcription</h3>
+                        <p class="text-sm text-gray-400 mb-4 h-10 overflow-hidden">An automated podcast transcription system and give the sentiment analysis of the whole content.</p>
                         
                         <div class="flex flex-wrap gap-2 mb-6">
                             <span class="px-2 py-1 bg-purple-500/10 text-purple-400 text-xs rounded-md border border-purple-500/20">Python</span>
-                            <span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-md border border-blue-500/20">FastAPI</span>
-                            <span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-md border border-emerald-500/20">Groq LLM</span>
-                            <span class="px-2 py-1 bg-slate-500/10 text-slate-400 text-xs rounded-md border border-slate-500/20">Qdrant DB</span>
-                            <span class="px-2 py-1 bg-green-500/10 text-green-400 text-xs rounded-md border border-green-500/20">LlamaIndex</span>
+                            <span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-md border border-blue-500/20">Streamlit</span>
+                            <span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-md border border-emerald-500/20">Whisper</span>
+                            <span class="px-2 py-1 bg-slate-500/10 text-slate-400 text-xs rounded-md border border-slate-500/20">Gemini api</span>
+                            <span class="px-2 py-1 bg-green-500/10 text-green-400 text-xs rounded-md border border-green-500/20">Librosa</span>
                         </div>
                         
                         <div class="flex justify-between items-center border-t border-white/5 pt-4">
                             <!-- GitHub Link -->
-                            <a href="https://github.com/farrakhnizam786/GAN-based-IMAGE-ENHANCEMENT-model" target="_blank" class="text-sm text-gray-300 hover:text-white flex items-center gap-2 transition">
-                                <i class="fab fa-github"></i> View Source
+                            <a href="https://ai-podcast-transcription2025-infosys-60-nryja5y3xjufvxyxnrvnar.streamlit.app/" target="_blank" class="text-sm text-gray-300 hover:text-white flex items-center gap-2 transition">
+                                <i class="fas fa-external-link-alt"></i> Live Demo
+                            </a>
+                            <a href="https://github.com/farrakhnizam786/Ai-Podcast-transcription2025-Infosys-6.0" target="_blank" class="text-sm text-gray-300 hover:text-white flex items-center gap-2 transition">
+                                <i class="fab fa-github"></i> View Project
                             </a>
                         </div>
                     </div>
@@ -319,27 +335,27 @@
 
 
                 <!-- PROJECT CARD 6 -->
-                <div class="glass-card overflow-hidden group">
+                <div class="glass-card overflow-hidden group project-card" data-category="mern">
                     <div class="h-48 overflow-hidden relative">
                         <!-- Project Image -->
-                        <img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&q=80" alt="Project 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                        <img src="https://drive.google.com/thumbnail?id=1QkW3DRhSjvAgbFMHVAg1pG2Y0BoB4qKC&sz=w1000" alt="Project 1" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
                         <div class="absolute inset-0 bg-gradient-to-t from-[#141419] to-transparent"></div>
                     </div>
                     <div class="p-6">
-                        <h3 class="text-xl font-bold text-white mb-2">HireMe AI (Tailor Pipeline)</h3>
-                        <p class="text-sm text-gray-400 mb-4 h-10 overflow-hidden">An automated resume tailoring and gap analysis pipeline powered by LLMs and Pydantic.</p>
+                        <h3 class="text-xl font-bold text-white mb-2">GaonKart-A-grameen-online-mart</h3>
+                        <p class="text-sm text-gray-400 mb-4 h-10 overflow-hidden">An Automated Grameen Online Mart.</p>
                         
                         <div class="flex flex-wrap gap-2 mb-6">
-                            <span class="px-2 py-1 bg-purple-500/10 text-purple-400 text-xs rounded-md border border-purple-500/20">Python</span>
-                            <span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-md border border-blue-500/20">FastAPI</span>
-                            <span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-md border border-emerald-500/20">Groq LLM</span>
-                            <span class="px-2 py-1 bg-slate-500/10 text-slate-400 text-xs rounded-md border border-slate-500/20">Qdrant DB</span>
-                            <span class="px-2 py-1 bg-green-500/10 text-green-400 text-xs rounded-md border border-green-500/20">LlamaIndex</span>
+                            <span class="px-2 py-1 bg-purple-500/10 text-purple-400 text-xs rounded-md border border-purple-500/20">React</span>
+                            <span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-md border border-blue-500/20">Express</span>
+                            <span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-md border border-emerald-500/20">MongoDB</span>
+                            <span class="px-2 py-1 bg-slate-500/10 text-slate-400 text-xs rounded-md border border-slate-500/20">Full stack</span>
+                            <span class="px-2 py-1 bg-green-500/10 text-green-400 text-xs rounded-md border border-green-500/20">E-commerce</span>
                         </div>
                         
                         <div class="flex justify-between items-center border-t border-white/5 pt-4">
                             <!-- GitHub Link -->
-                            <a href="https://github.com/farrakhnizam786/MY_AI-portfolio-RAG_LLM" target="_blank" class="text-sm text-gray-300 hover:text-white flex items-center gap-2 transition">
+                            <a href="https://github.com/farrakhnizam786/GaonKart-A-grameen-online-mart-using-React-and-express" target="_blank" class="text-sm text-gray-300 hover:text-white flex items-center gap-2 transition">
                                 <i class="fab fa-github"></i> View Source
                             </a>
                         </div>
@@ -584,8 +600,8 @@
                         <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-blue-600 flex items-center justify-center shrink-0 border border-purple-400/30">
                             <i class="fas fa-robot text-white text-sm"></i>
                         </div>
-                        <div class="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-5 py-3 text-sm text-gray-200 max-w-[85%] shadow-md leading-relaxed">
-                            ${data.answer}
+                        <div class="bg-white/5 border border-white/10 rounded-2xl rounded-tl-sm px-5 py-3 text-sm text-gray-200 max-w-[85%] shadow-md leading-relaxed markdown-body">
+                            ${marked.parse(data.answer)}
                         </div>
                     </div>
                 `;
@@ -604,6 +620,40 @@
             }
             chatMessages.scrollTop = chatMessages.scrollHeight;
         });
+
+        // ==========================================
+        // UI Helpers
+        // ==========================================
+        
+        // Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('menu-icon');
+            sidebar.classList.toggle('-translate-x-full');
+            if(sidebar.classList.contains('-translate-x-full')) {
+                icon.className = 'fas fa-bars';
+            } else {
+                icon.className = 'fas fa-times';
+            }
+        }
+
+        // Project Filtering
+        function filterProjects(category) {
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.className = 'filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition';
+            });
+            document.getElementById('filter-' + category).className = 'filter-btn px-4 py-1.5 rounded-full text-sm font-medium bg-purple-600 text-white transition';
+
+            // Filter cards
+            document.querySelectorAll('.project-card').forEach(card => {
+                if(category === 'all' || card.getAttribute('data-category') === category) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
 
         // ==========================================
         // Job Matcher Logic
